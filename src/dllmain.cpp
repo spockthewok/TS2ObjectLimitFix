@@ -21,7 +21,7 @@ DWORD WINAPI MainThread(LPVOID param)
 
     ///* Code cave at 0x11D2EB0 *///
     // TEST ESI,ESI (check ESI == null)
-    // JZ 0x81105C (break out of loop if null)
+    // JZ 0x81105C (break to next iteration of loop if null)
     // MOV EDX,[ESI] (do swallowed instructions if != null)
     // PUSH EBX
     // MOV ECX,ESI
@@ -41,7 +41,7 @@ DWORD WINAPI MainThread(LPVOID param)
 
     ///* Code cave at 0x11D2EC2 *///
     // TEST ESI,ESI (check ESI == null)
-    // JZ 0x810F79 (break out of loop if null)
+    // JZ 0x810F79 (break to next iteration of loop if null)
     // MOV EDX,[ESI] (do swallowed instructions if != null)
     // PUSH EBX
     // MOV ECX,ESI
@@ -54,14 +54,14 @@ DWORD WINAPI MainThread(LPVOID param)
                          0xE9, 0x76, 0xE0, 0x63, 0xFF};
     WriteToMemory((DWORD)modBase + FUN2_JMPTO_OFFSET, cave2Bytes, sizeof(cave2Bytes) / sizeof(*cave2Bytes));
 
-    ///* FUN_00810e00 *///
+    ///* FUN_00810E00 *///
     // JMP 0x11D2ED4
     char fun3Bytes[] = {0xE9, 0x4E, 0x20, 0x9C, 0x00};
     WriteToMemory((DWORD)modBase + FUN3_JMPFROM_OFFSET, fun3Bytes, sizeof(fun3Bytes) / sizeof(*fun3Bytes));
 
     ///* Code cave at 0x11D2ED4 *///
     // TEST EDI,EDI (check EDI == null)
-    // JZ 0x810EC9 (break out of loop if null)
+    // JZ 0x810EC9 (break to next iteration of loop if null)
     // MOV EDX,[EDI] (do swallowed instructions if != null)
     // PUSH EAX
     // MOV ECX,EDI

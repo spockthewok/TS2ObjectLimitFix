@@ -10,14 +10,17 @@ While Sims 2 players who experience these crashes might believe them to be the c
 the explanation is actually much simpler.
 
 There exists three functions within the game's binary at addresses `0x81101D`, `0x810EF0`, and `0x810E00`. These functions are only called when the Build/Buy mode
-menu is open and each use a loop to iterate over items stored in an array (presumably containing all the objects the player can buy). Cross-references with the deobfuscated
-binary from the macOS port of the game indicate these functions perform an insertion sort.
+menu is open and each use a loop to iterate over items stored in an array (presumably containing data for all the objects the player can buy). Cross-references with the
+deobfuscated binary from the macOS port of the game indicate these functions perform an insertion sort.
 
 The fatal flaw with these functions is that they contain no checks to validate whether the pointers they are trying to dereference and operate on are `NULL`.
 Although this does not seem to present any issues when playing with little to no custom content, as the number of buyable objects loaded by the game increases, the
 size of the array they are contained in therefore also increases, which increases the probability of the sorting algorithm encountering `NULL` data.
 
-This patch merely adds the necessary validity checks to the three functions, that are performed before any dereferencing occurs.
+The real culprit of this issue would be whichever function placed `NULL` data into the array to begin with, but patching the endpoint of the crashes was a more
+straightforward fix than trying to catch the source of the data.
+
+This patch merely adds the necessary validity checks to the three functions, which are performed before any dereferencing occurs.
 
 ## Installation
 **For Sims2RPC**
