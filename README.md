@@ -1,23 +1,28 @@
 # TS2 Object Limit Fix
 ## About
-A patch that fixes crashes in Build/Buy mode when playing The Sims 2 with a large amount of custom content (known as the 'object limit' bug).
+A patch that fixes crashes in Build/Buy mode when playing The Sims 2 with a large amount of custom content, a result of surpassing the game's internal 16-bit limit on object IDs.
 
 Made for use with The Sims 2: Ultimate Collection, using either [Sims2RPC](https://modthesims.info/d/648220/sims2rpc-modded-sims-2-launcher-for-mansion-and-garden.html)
 or [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader).
 
 ## Explanation
-While Sims 2 players who experience these crashes might believe them to be the cause of some kind of hardcoded limit on the number of objects the game can load,
-the explanation is actually much simpler.
+Each OBJD for every object the game loads (including Sims) is stored in a data structure and assigned an object ID from 0&ndash;32,767. This upper limit is enforced by
+a manual cast to a signed `short` integer.
 
 There exists three functions within the game's binary at addresses `0x81101D`, `0x810EF0`, and `0x810E00`. These functions are only called when the Build/Buy mode
-menu is open and each use a loop to iterate over items stored in an array (presumably containing data for all the objects the player can buy). Cross-references with the
+menu is open and each use a loop to iterate over items stored in a data structure (presumably containing the OBJDs of all the objects the player can buy). Cross-references with the
 deobfuscated binary from the macOS port of the game indicate these functions perform an insertion sort.
 
 The fatal flaw with these functions is that they contain no checks to validate whether the pointers they are trying to dereference and operate on during the sort are `NULL`.
-Although this does not seem to present any issues when playing with little or no custom content, as the number of buyable objects loaded by the game increases, the number of
-allocations the game is performing to store this data also increases &mdash; this raises the likelihood of one of these allocations failing and `NULL` data entering the array unchecked.
+This issue is compounded by the fact the game nullifies the pointers to any OBJDs whose assigned ID exceeds 32,767 before immediately dereferencing them anyway, leading 
+to an access violation and the game crashing.
 
 This patch merely adds the necessary validity checks to the three functions, which are performed before any dereferencing occurs.
+
+## Things To Note
+Any objects with an assigned ID of 32,768 and above will not be able to be purchased from the Build/Buy catalogue, as all of the game's functionality revolving around objects
+checks only for IDs up to 32,767. This is understandably frustrating, but the alternative is to have the catalogue be completely unusable and crash every time you try to interact
+with it.
 
 ## Installation
 **For Sims2RPC**
