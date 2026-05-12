@@ -10,10 +10,9 @@ Each OBJD for every object the game loads (including Sims) is stored in a data s
 a manual cast to a signed `short` integer.
 
 There exists three functions within the game's binary at addresses `0x81101D`, `0x810EF0`, and `0x810E00`. These functions are only called when the Build/Buy mode
-menu is open and each use a loop to iterate over items stored in a data structure (presumably containing the OBJDs of all the objects the player can buy). Cross-references with the
-deobfuscated binary from the macOS port of the game indicate these functions perform an insertion sort.
+menu is open and each use a loop to iterate over items stored in a data structure (presumably containing the OBJDs of all the objects the player can buy).
 
-The fatal flaw with these functions is that they contain no checks to validate whether the pointers they are trying to dereference and operate on during the sort are `NULL`.
+The fatal flaw with these functions is that they contain no checks to validate whether the pointers they are trying to dereference and operate on are `NULL`.
 This issue is compounded by the fact the game nullifies the pointers to any OBJDs whose assigned ID exceeds 32,767 before immediately dereferencing them anyway, leading 
 to an access violation and the game crashing.
 
